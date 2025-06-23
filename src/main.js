@@ -5,7 +5,7 @@ import App from './App.vue'
 
 import './style.css'
 import Home from "@/components/Home.vue";
-import View from "@/components/View.vue";
+import View from "@/components/view/View.vue";
 
 const pinia = createPinia();
 
@@ -15,6 +15,7 @@ const app = createApp(App)
 const routes = [
     { path: '/', component: Home },
     { path: '/view', component: View },
+    { path: '/info', component: () => import('@/components/Info.vue') },
 ]
 
 const router = createRouter({

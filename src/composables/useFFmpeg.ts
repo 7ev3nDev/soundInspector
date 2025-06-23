@@ -138,17 +138,27 @@ export async function convertToWav(
     audioData: Uint8Array,
     inputFilename: string
 ): Promise<Uint8Array> {
+    const outputFilename = 'output.wav';
+
+    if (!inputFilename.includes('.')) {
+        throw new Error('inputFilename must include a file extension (e.g., "input.mp3")');
+    }
+
+    if (inputFilename.endsWith('.wav')) {
+        console.warn('Input is already in WAV format, returning original data.');
+        return audioData;
+    }
+    
     const { isReady, load, exec, writeFile, readFile } = useFFmpeg();
 
     if (!isReady.value) {
         await load();
     }
-
-    const outputFilename = 'output.wav';
-
+    
     await writeFile(inputFilename, audioData);
+    await exec(['-y', '-i', inputFilename, outputFilename]);
 
-    await exec(['-i', inputFilename, outputFilename]);
-
+    console.info(logs.value.join("\n"));
+    
     return await readFile(outputFilename);
 }
