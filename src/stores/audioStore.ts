@@ -5,7 +5,7 @@ import {getWavDuration} from "../composables/audioUtils";
 export const useAudioStore = defineStore('audio', () => {
     const file = ref<File | null>(null)
     const name = ref('')
-    const convertedWavBlob = ref<Uint8Array | null>(null)
+    const convertedWavBytes = ref<Uint8Array | null>(null)
     const byteArray = ref<Uint8Array | null>(null)
     const duration = ref(0)
     const decodedText = ref('')
@@ -13,22 +13,22 @@ export const useAudioStore = defineStore('audio', () => {
     function setFile(
         newFile: File,
         bytes: Uint8Array,
-        wavBlob: Uint8Array,
+        wavBytes: Uint8Array,
         text = ''
     ) {
         file.value = newFile
         name.value = newFile.name
         byteArray.value = bytes
-        convertedWavBlob.value = wavBlob
+        convertedWavBytes.value = wavBytes
         decodedText.value = text
-        duration.value = getWavDuration(wavBlob)
+        duration.value = getWavDuration(wavBytes)
     }
 
     function clear() {
         file.value = null
         name.value = ''
         byteArray.value = null
-        convertedWavBlob.value = null
+        convertedWavBytes.value = null
         decodedText.value = ''
         duration.value = 0
     }
@@ -36,7 +36,7 @@ export const useAudioStore = defineStore('audio', () => {
     return {
         file,
         name,
-        convertedWavBlob,
+        convertedWavBytes,
         byteArray,
         duration,
         decodedText,

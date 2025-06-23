@@ -31,13 +31,14 @@ function handleFile(file) {
   reader.onload = async (e) => {
     const byteArray = new Uint8Array(e.target.result);
     const textContent = new TextDecoder().decode(byteArray);
+    const converted = await convertToWav(
+        byteArray, file.name
+    );
 
     audioStore.setFile(
         file,
-        await convertToWav(
-            byteArray, file.name
-        ),
         byteArray,
+        converted,
         textContent
     );
     console.info(`The file '${file.name}' as been loaded successfully.`);
