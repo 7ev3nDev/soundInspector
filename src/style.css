@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&display=swap');
+
+body {
+    /* https://stackoverflow.com/questions/35361986/css-gradient-checkerboard-pattern */
+    --back-transp: 0.75;
+    background: repeating-conic-gradient(rgb(0, 6, 113, var(--back-transp)) 0 25%, rgb(79, 0, 131, var(--back-transp)) 0 50%)
+            50% / 30px 30px;
+    color: white;
+    
+    padding: 0;
+    margin: 0;
+    
+    min-height: 100vh;
+    box-sizing: border-box;
+    
+    --primary: #4C29EB;
+    --primary-text: #FFF;
+    --primary-hover: #2f12b6;
+    
+    --secondary: #EDE9FD;
+    --secondary-text: #000;
+    --secondary-hover: #948eaf;
+
+    --error: #eb294d;
+    --error-text: #EDE9FD;
+}
+
+div, label {
+    box-sizing: border-box;
+}
+
+h1, h2, h3, p {
+    margin: 0;
+    padding: 0;
+}
+
+div#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+
+    gap: 10px;
+    
+    &.active {
+        justify-content: start;
+    }
+}
