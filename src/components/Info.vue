@@ -4,7 +4,7 @@
 <template>
   <div class="container">
     <div class="content">
-      <h2>audioInspector</h2>
+      <h2>soundInspector</h2>
       <p>A web application steganography tool for analyzing all kinds of audio files and their metadata.</p>
       <mspace />
       <mspace />

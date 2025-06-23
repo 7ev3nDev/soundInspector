@@ -26,7 +26,7 @@ onMounted(() => {
   <!-- TODO: move header to another part -->
   <header :class="{ active: route.path === '/view' }">
     <div class="content">
-      <h2>audioInspector</h2>
+      <h2>soundInspector</h2>
       <div class="btns">
         <RouterLink to="/info" class="btn" v-if="route.path === '/'">
           <InfoIcon />
