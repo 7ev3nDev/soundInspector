@@ -2,8 +2,10 @@
 
 body {
     /* https://stackoverflow.com/questions/35361986/css-gradient-checkerboard-pattern */
-    --back-transp: 0.75;
-    background: repeating-conic-gradient(rgb(0, 6, 113, var(--back-transp)) 0 25%, rgb(79, 0, 131, var(--back-transp)) 0 50%)
+    --back-transp: 0.85;
+    background: repeating-conic-gradient(
+            rgba(0, 4, 76, var(--back-transp)) 0 25%,
+            rgba(45, 0, 74, var(--back-transp)) 0 50%)
             50% / 30px 30px;
     color: white;
     
