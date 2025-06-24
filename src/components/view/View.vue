@@ -13,6 +13,7 @@ const router = useRouter();
 import WaveSurfer from 'wavesurfer.js'
 import SpectrogramPlugin from 'wavesurfer.js/dist/plugins/spectrogram.esm.js'
 import Hover from 'wavesurfer.js/dist/plugins/hover.esm.js'
+import MorseDecoder from "@/components/view/MorseDecoder.vue";
 
 const waveformRef = ref(null)
 let wavesurfer = null
@@ -112,6 +113,13 @@ onUnmounted(() => {
   </div>
   
   <div class="container credits">
+    <span>Morse Code</span>
+    <div class="content ">
+      <MorseDecoder />
+    </div>
+  </div>
+  
+  <div class="container credits">
     <div class="content ">
       Made with <3 by Paolones - Using wavesurfer.js
     </div>
@@ -135,6 +143,10 @@ div.container {
   flex-direction: column;
 
   margin-bottom: 16px;
+  & > span {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 .content {
