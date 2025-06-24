@@ -78,6 +78,8 @@ header > div.menu {
   border-radius: 32px;
   padding: 11px 24px;
 
+  z-index: 1000;
+  
   &.open {
     display: block;
   }
