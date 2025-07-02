@@ -47,7 +47,7 @@ function drawBinary(binary) {
   const step = Math.ceil(binary.length / canvas.width);
   for (let i = 0; i < canvas.width; i++) {
     const val = binary[i * step] || 0;
-    ctx.fillStyle = val ? "black" : "white";
+    ctx.fillStyle = val ? "black" : "transparent";
     ctx.fillRect(i, 0, 1, canvas.height);
   }
 }
@@ -57,7 +57,7 @@ function drawBinary(binary) {
 
 <template>
   <template v-if="!morseCode.includes('?')">
-    <canvas ref="binaryCanvas" ></canvas>
+    <canvas ref="binaryCanvas" height="50"></canvas>
     {{ morseCode }}
   </template>
   <template v-else>

@@ -158,7 +158,7 @@ export async function convertToWav(
     await writeFile(inputFilename, audioData);
     await exec(['-y', '-i', inputFilename, outputFilename]);
 
-    console.info(logs.value.join("\n"));
+    // console.info(logs.value.join("\n"));
     
     return await readFile(outputFilename);
 }

@@ -15,7 +15,7 @@ const app = createApp(App)
 const routes = [
     { path: '/', component: Home },
     { path: '/view', component: View },
-    { path: '/info', component: () => import('@/components/Info.vue') },
+    { path: '/info', component: () => import('@/components/info/Info.vue') },
 ]
 
 const router = createRouter({

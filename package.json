@@ -11,15 +11,14 @@
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
-    "@meersagor/wavesurfer-vue": "^1.0.0",
     "pinia": "^3.0.3",
     "vue": "^3.5.13",
-    "vue-router": "^4.5.1",
-    "wavesurfer.js": "^7.9.5"
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
     "vite": "^6.2.4",
-    "vite-plugin-vue-devtools": "^7.7.2"
+    "vite-plugin-vue-devtools": "^7.7.2",
+    "wavesurfer.js": "^7.3.6"
   }
 }

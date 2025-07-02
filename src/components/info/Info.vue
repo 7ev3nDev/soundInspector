@@ -1,4 +1,24 @@
 <script setup>
+
+import {onMounted, onUnmounted, shallowRef} from "vue";
+import InfoButtons from "@/components/info/InfoButtons.vue";
+import {useHeaderStore} from "@/stores/headerStore.js";
+
+const viewButtons = shallowRef(InfoButtons);
+const headerStore = useHeaderStore();
+
+
+onMounted(() => {
+  headerStore.setButtonsContent({
+    component: viewButtons,
+    props: {}
+  })
+});
+
+onUnmounted(() => {
+  headerStore.clear()
+})
+
 </script>
 
 <template>
@@ -23,7 +43,21 @@ mspace {
   display: block;
 }
 
+p {
+  word-break: break-word !important;
+}
+
 div.container {
   height: 260px;
+}
+
+
+@media screen and (max-width: 600px) {
+  div.container {
+    height: 370px !important;
+    & > .content {
+      max-height: unset;
+    }
+  }
 }
 </style>

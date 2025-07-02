@@ -28,22 +28,11 @@ onMounted(() => {
     <div class="content">
       <h2>soundInspector</h2>
       <div class="btns">
+        <component :is="headerStore.buttonsContent.component" v-bind="headerStore.buttonsContent.props" />
+
         <RouterLink to="/info" class="btn" v-if="route.path === '/'">
           <InfoIcon />
         </RouterLink>
-        <RouterLink to="/" class="btn" v-if="route.path === '/info'">
-          <BackIcon />
-        </RouterLink>
-        
-        <template v-if="audioStore.file">
-          <span class="btn no-action">
-            {{ audioStore.file.name }}
-          </span>
-          
-          <span class="btn mini" @click="headerStore.toggleMenu()">
-            <MoreIcon />
-          </span>
-        </template>
       </div>
     </div>
     <div class="menu" :class="{ open: headerStore.isMenuOpen }">
@@ -118,6 +107,10 @@ header > div.menu {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      
+      &.no-action {
+        cursor: default;
+      }
 
       &:hover {
         background: var(--secondary-hover);
@@ -167,7 +160,7 @@ header {
     padding-inline: 30px;
     
     & > h2 {
-      font-size: 48px;
+      font-size: 46px;
     }
     
     & > .btns {
@@ -180,50 +173,17 @@ header {
   
 }
 
-.btn {
-  cursor: pointer;
-  
-  background: var(--primary);
-  color: white;
-  
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  
-  min-width: 96px;
-  height: 40px;
-  border-radius: 20px;
-  
-  padding-inline: 16px;
-
-  box-sizing: border-box;
-  box-shadow: rgba(0, 0, 0, 0.6) 0 2px 8px 0;
-  transition: all 0.2s;
-  
-  &:hover {
-    background: var(--primary-hover);
-    scale: 1.1;
-  }
-  
-  &.mini {
-    min-width: 40px;
-  }
-  
-  &.no-action {
-    cursor: unset;
-    box-shadow: none;
-    
-    &:hover {
-      background: var(--primary);
-      scale: 1;
-    }
-  }
-}
 
 main {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+@media screen and (max-width: 600px) {
+  div.content > h2 {
+    font-size: 26px !important;
+  }
 }
 </style>

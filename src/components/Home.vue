@@ -4,12 +4,15 @@ import { useRouter } from 'vue-router';
 import { useAudioStore } from "@/stores/audioStore.ts";
 import FileIcon from "@/components/icons/FileIcon.vue";
 import {convertToWav} from "@/composables/useFFmpeg.js";
+import {useMediaStore} from "@/stores/mediaStore.js";
+import {escapeHTML} from "@/composables/generalUtils.js";
 
 const router = useRouter();
 const invalidFile = ref(false);
 const dragOver = ref(false);
 
 const audioStore = useAudioStore();
+const mediaStore = useMediaStore();
 
 function checkValidity(type) {
   return type.startsWith("audio/");
@@ -30,16 +33,18 @@ function handleFile(file) {
   const reader = new FileReader();
   reader.onload = async (e) => {
     const byteArray = new Uint8Array(e.target.result);
-    const textContent = new TextDecoder().decode(byteArray);
+    const textContent = new TextDecoder("latin1").decode(byteArray);
     const converted = await convertToWav(
         byteArray, file.name
     );
+
+    const regex = new RegExp(`[ -~]{${4},}`, "g");
 
     audioStore.setFile(
         file,
         byteArray,
         converted,
-        textContent
+        escapeHTML(textContent.match(regex).join("\n")).replaceAll("\n", "<br>") || ""
     );
     console.info(`The file '${file.name}' as been loaded successfully.`);
     await router.push('/view');
@@ -90,7 +95,14 @@ const handleDrop = (event) => {
          :class="{ dragover: dragOver, invalid: invalidFile }" 
          @dragover="handleDragOver" @dragleave="handleDragLeave" @drop="handleDrop">
     <FileIcon :color="invalidFile ? 'var(--error-text)' : 'var(--secondary-text)'" />
-    <h2>Click or drop your audio file here</h2>
+    <h2>Click 
+      <template v-if="mediaStore.isDesktop">
+        or drop
+      </template>
+      <template v-else>
+        to select
+      </template>
+      your audio file here</h2>
     <p>We support any audio file supported by ffmpeg</p>
   </label>
   <input type="file" name="audio_file" id="audio_file" accept="audio/*" @change="handleFileChange" />
@@ -114,6 +126,7 @@ div.container {
       margin-top: 30px;
       font-size: 20px;
       line-height: 16px;
+      text-align: center;
     }
     & > p {
       font-size: 12px;

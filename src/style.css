@@ -96,3 +96,56 @@ div.container {
         }
     }
 }
+
+
+.btn {
+    cursor: pointer;
+
+    background: var(--primary);
+    color: white;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 96px;
+    height: 40px;
+    border-radius: 20px;
+
+    padding-inline: 16px;
+
+    box-sizing: border-box;
+    box-shadow: rgba(0, 0, 0, 0.6) 0 2px 8px 0;
+    transition: all 0.2s;
+
+    &:hover {
+        background: var(--primary-hover);
+        scale: 1.1;
+    }
+
+    &.mini {
+        min-width: 40px;
+    }
+
+    &.no-action {
+        cursor: unset;
+        box-shadow: none;
+
+        &:hover {
+            background: var(--primary);
+            scale: 1;
+        }
+    }
+}
+
+
+@media screen and (max-width: 600px) {
+    div.container {
+        padding-inline: 8px;
+    }
+
+    .btn {
+        min-width: 56px;
+        height: 36px;
+    }
+}

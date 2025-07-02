@@ -8,12 +8,20 @@ export const useHeaderStore = defineStore('header', {
                 component: () => null,
                 props: {}
             },
+            buttonsContent: {
+                component: () => null,
+                props: {}
+            },
             isMenuOpen: false,
             emits: {}
         }
     },
     
     actions: {
+        setButtonsContent(content: { component: () => VueElement, props?: Record<string, any> }) {
+            this.buttonsContent = content
+        },
+        
         setMenuContent(content: { component: () => VueElement, props?: Record<string, any> }) {
             this.menuContent = content
         },
@@ -40,6 +48,10 @@ export const useHeaderStore = defineStore('header', {
         
         clear() {
             this.menuContent = {
+                component: () => null,
+                props: {}
+            }
+            this.buttonsContent = {
                 component: () => null,
                 props: {}
             }
