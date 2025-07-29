@@ -119,16 +119,13 @@ onMounted(() => {
     wavesurfer.load(url)
 
     wavesurfer.once('decode', () => {
-      const slider = document.querySelectorAll('input[type="range"]')
+      const slider = document.querySelector('input[type="range"]')
 
-      slider.forEach(el => {
-        el
-            .addEventListener('input', (e) => {
-              const minPxPerSec = e.target.valueAsNumber
-              wavesurfer.zoom(minPxPerSec)
-            })
-      })
-
+      slider
+          .addEventListener('input', (e) => {
+            const minPxPerSec = e.target.valueAsNumber
+            wavesurfer.zoom(minPxPerSec)
+          })
     })
 
   }
@@ -191,7 +188,7 @@ onUnmounted(() => {
 div.container {
   display: flex;
   flex-direction: column;
-  max-width: 900px;
+  max-width: 960px;
 
   margin-bottom: 16px;
 
