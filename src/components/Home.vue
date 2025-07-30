@@ -30,13 +30,15 @@ function handleFile(file) {
   } else {
     invalidFile.value = false;
   }
+  
+  loading.value = true;
 
   const reader = new FileReader();
   reader.onload = async (e) => {
     const byteArray = new Uint8Array(e.target.result);
     const textContent = new TextDecoder("latin1").decode(byteArray);
     const converted = await convertToWav(
-        byteArray, file.name
+        new Uint8Array(byteArray), file.name
     );
 
     const regex = new RegExp(`[ -~]{${4},}`, "g");
@@ -56,8 +58,6 @@ function handleFile(file) {
 const handleFileChange = (event) => {
   const file = event.target.files[0];
 
-  loading.value = true;
-
   handleFile(file);
 };
 
@@ -70,6 +70,7 @@ const handleDragOver = (event) => {
     if (!checkValidity(fileType)) {
       invalidFile.value = true;
       dragOver.value = false;
+      loading.value = false;
       return;
     } else {
       invalidFile.value = false;

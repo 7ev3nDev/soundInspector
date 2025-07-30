@@ -11,7 +11,7 @@ const mediaStore = useMediaStore();
 
 <template>
 <span class="btn no-action" v-if="mediaStore.isDesktop">
-  {{ audioStore.file.name }}
+  {{ audioStore.file?.name }}
 </span>
 
 <span class="btn mini" @click="headerStore.toggleMenu()">

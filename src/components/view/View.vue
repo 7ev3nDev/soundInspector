@@ -5,6 +5,7 @@ import {onMounted, onUnmounted, shallowRef, watch} from "vue";
 import {useHeaderStore} from "@/stores/headerStore.js";
 import ViewMenu from "@/components/view/ViewMenu.vue";
 import {ref} from 'vue'
+import { parseBuffer } from 'music-metadata';
 
 const audioStore = useAudioStore();
 const headerStore = useHeaderStore();
@@ -58,7 +59,14 @@ function downloadWav(uint8array, filename = 'output.wav') {
 const viewMenu = shallowRef(ViewMenu);
 const viewButtons = shallowRef(ViewButtons);
 
-onMounted(() => {
+/**
+ * @type {import('music-metadata').IAudioMetadata|null}
+ */
+const metadata = ref(null);
+
+const showOtherMetadata = ref(false);
+
+onMounted(async () => {
   document.querySelector("div#app").classList.add("active");
   headerStore.setMenuContent({
     component: viewMenu,
@@ -75,10 +83,6 @@ onMounted(() => {
   })
 
   if (audioStore.convertedWavBytes) {
-    (async () => {
-      // console.log(new TextDecoder("utf-8").decode(new Uint8Array(extractMessage(new Uint8Array(audioStore.byteArray)))));
-    })();
-
     const blob = new Blob([audioStore.convertedWavBytes], {type: 'audio/wav'})
     const url = URL.createObjectURL(blob)
 
@@ -128,6 +132,8 @@ onMounted(() => {
           })
     })
 
+    metadata.value = await parseBuffer(audioStore.byteArray);
+    console.log(metadata.value)
   }
 });
 
@@ -138,9 +144,53 @@ onUnmounted(() => {
   if (wavesurfer) wavesurfer.destroy()
 })
 
+function printMeta(el) {
+  if (Array.isArray(el)) {
+    return el.map((item) => {
+      if (typeof item === 'object') {
+        return JSON.stringify(item, null, 2);
+      }
+      return item;
+    }).join(', ') || 'Empty Array';
+  } else if (typeof el === 'object') {
+    return JSON.stringify(el, null, 2);
+  } else {
+    return el;
+  } 
+}
+
 </script>
 
 <template>
+  <div class="list" v-if="metadata?.format">
+    <div class="container meta" v-for="(value, key) in metadata.format" :key="key">
+      <span>{{ key }}</span>
+      <div class="content">
+        {{ printMeta(value) }}
+      </div>
+    </div>
+    
+    <div class="container meta" v-for="(value, key) in metadata.common" :key="key" v-if="showOtherMetadata">
+      <span>{{ key }}</span>
+      <div class="content">
+        {{ printMeta(value) }}
+      </div>
+    </div>
+    
+    <div class="container meta" v-for="(value, key) in metadata.native" :key="key" v-if="showOtherMetadata">
+      <span>{{ key }}</span>
+      <div class="content">
+        {{ printMeta(value) }}
+      </div>
+    </div>
+  </div>
+  
+  <div class="container meta" id="meta-toggle">
+    <a class="btn" @click.prevent="showOtherMetadata = !showOtherMetadata">
+      {{ showOtherMetadata ? 'See Less Metadata' : 'Show More Metadata' }}
+    </a>
+  </div>
+  
   <div class="container">
     <span>Audio Viewer - Wave + Spectogram</span>
     <div class="content waveform">
@@ -185,12 +235,49 @@ onUnmounted(() => {
 </style>
 
 <style scoped>
+div.list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  
+  max-width: 960px;
+  
+  gap: 16px;
+  padding: 16px;
+  
+  row-gap: 10px;
+  
+  & > div.container {
+    margin-bottom: 0;
+  }
+}
+
+div#meta-toggle {
+  background: #6a0fd6;
+  
+  & > a.btn {
+    background: var(--secondary);
+    color: var(--secondary-text);
+  }
+}
+
 div.container {
   display: flex;
   flex-direction: column;
   max-width: 960px;
 
   margin-bottom: 16px;
+  
+  &.meta {
+    max-width: fit-content;
+    padding-inline: 16px;
+    border-radius: 24px;
+
+    & > .content {
+      text-align: center;
+    }
+  }
 
   &.credits {
     max-width: fit-content;
