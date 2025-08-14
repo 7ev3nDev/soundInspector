@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import {defineStore} from 'pinia'
+import {ref, onMounted, onBeforeUnmount} from 'vue'
 
 export const useMediaStore = defineStore('media', () => {
     const isMobile = ref(false)

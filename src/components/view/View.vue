@@ -5,15 +5,15 @@ import {onMounted, onUnmounted, shallowRef, watch} from "vue";
 import {useHeaderStore} from "@/stores/headerStore.js";
 import ViewMenu from "@/components/view/ViewMenu.vue";
 import {ref} from 'vue'
-import { parseBuffer } from 'music-metadata';
+import {parseBuffer} from 'music-metadata';
 
 const audioStore = useAudioStore();
 const headerStore = useHeaderStore();
 const router = useRouter();
 
-// import WaveSurfer from "wavesurfer.js";
-// import SpectrogramPlugin from "wavesurfer.js/plugins/spectrogram";
-// import HoverPlugin from "wavesurfer.js/plugins/hover";
+if (!audioStore.file) {
+  router.push("/");
+}
 
 /**
  * @type {import('wavesurfer.js').default}
@@ -25,36 +25,22 @@ import WaveSurfer from 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.esm.js
 import SpectrogramPlugin from 'https://unpkg.com/wavesurfer.js@7/dist/plugins/spectrogram.esm.js'
 import HoverPlugin from 'https://unpkg.com/wavesurfer.js@7/dist/plugins/hover.esm.js'
 
-
 import MorseDecoder from "@/components/view/MorseDecoder.vue";
 import ViewButtons from "@/components/view/ViewButtons.vue";
+import Equalizer from "@/components/view/Equalizer.vue";
+import {downloadWav} from "@/composables/generalUtils.js";
 
+const isPlaying = ref(false);
+
+const wavesurferMediaElement = ref(null);
+const wavesurferAudioBuffer = ref(null);
+const wavesurferAudioContext = ref(null);
+const wavesurferSourceNode = ref(null);
 const waveformRef = ref(null)
 /**
  * @type {import('wavesurfer.js').default}
  */
 let wavesurfer = null
-
-if (!audioStore.file) {
-  router.push("/");
-}
-
-function downloadWav(uint8array, filename = 'output.wav') {
-  const blob = new Blob([uint8array], {type: 'audio/wav'});
-
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-
-  const lastDotIndex = filename.lastIndexOf(".");
-  a.download = filename.substring(0, lastDotIndex) + '.wav';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-
-  URL.revokeObjectURL(url);
-}
 
 const viewMenu = shallowRef(ViewMenu);
 const viewButtons = shallowRef(ViewButtons);
@@ -65,6 +51,7 @@ const viewButtons = shallowRef(ViewButtons);
 const metadata = ref(null);
 
 const showOtherMetadata = ref(false);
+const showEqualizer = ref(false);
 
 onMounted(async () => {
   document.querySelector("div#app").classList.add("active");
@@ -79,8 +66,17 @@ onMounted(async () => {
   headerStore.setEmits({
     download: () => {
       downloadWav(audioStore.convertedWavBytes, audioStore.name);
+    },
+    openEqualizer: () => {
+      if (!wavesurferSourceNode.value) {
+        console.error("Audio graph not ready yet!");
+        return;
+      }
+      showEqualizer.value = true;
+      headerStore.setIsMenuOpen(false);
     }
   })
+
 
   if (audioStore.convertedWavBytes) {
     const blob = new Blob([audioStore.convertedWavBytes], {type: 'audio/wav'})
@@ -88,6 +84,7 @@ onMounted(async () => {
 
     wavesurfer = WaveSurfer.create({
       container: waveformRef.value,
+
       waveColor: '#8ecae6',
       progressColor: '#219ebc',
       height: 128,
@@ -97,7 +94,7 @@ onMounted(async () => {
       fillParent: true,
       mediaControls: true,
       autoScroll: true,
-      minPxPerSec: 100,
+      minPxPerSec: 10,
       partialRender: true,
       plugins: [
         SpectrogramPlugin.create({
@@ -122,7 +119,7 @@ onMounted(async () => {
 
     wavesurfer.load(url)
 
-    wavesurfer.once('decode', () => {
+    wavesurfer.once('decode', async () => {
       const slider = document.querySelector('input[type="range"]')
 
       slider
@@ -130,10 +127,31 @@ onMounted(async () => {
             const minPxPerSec = e.target.valueAsNumber
             wavesurfer.zoom(minPxPerSec)
           })
+
+      wavesurferAudioBuffer.value = wavesurfer.getDecodedData();
+
+      wavesurferAudioContext.value = new AudioContext();
+      wavesurferMediaElement.value = wavesurfer.getMediaElement();
+      wavesurferSourceNode.value = wavesurferAudioContext.value.createMediaElementSource(
+          wavesurferMediaElement.value
+      );
+
+      wavesurferSourceNode.value.connect(wavesurferAudioContext.value.destination);
     })
 
+    wavesurfer.on('play', () => {
+      isPlaying.value = true;
+    });
+
+    wavesurfer.on('pause', () => {
+      isPlaying.value = false;
+    });
+
+    wavesurfer.on('finish', () => {
+      isPlaying.value = false;
+    });
+
     metadata.value = await parseBuffer(audioStore.byteArray);
-    console.log(metadata.value)
   }
 });
 
@@ -141,7 +159,20 @@ onUnmounted(() => {
   document.querySelector("div#app").classList.remove("active");
   headerStore.clear()
   audioStore.clear()
-  if (wavesurfer) wavesurfer.destroy()
+  if (wavesurfer) {
+    wavesurfer.destroy();
+    wavesurfer = null;
+  }
+
+  if (wavesurferAudioContext.value) {
+    if (wavesurferSourceNode.value) {
+      wavesurferSourceNode.value.disconnect();
+      wavesurferSourceNode.value = null;
+    }
+    wavesurferAudioContext.value.close();
+    wavesurferAudioContext.value = null;
+  }
+
 })
 
 function printMeta(el) {
@@ -156,7 +187,19 @@ function printMeta(el) {
     return JSON.stringify(el, null, 2);
   } else {
     return el;
-  } 
+  }
+}
+
+function playAudio() {
+  if (wavesurfer) {
+    wavesurfer.play();
+  }
+}
+
+function pauseAudio() {
+  if (wavesurfer) {
+    wavesurfer.pause();
+  }
 }
 
 </script>
@@ -169,14 +212,14 @@ function printMeta(el) {
         {{ printMeta(value) }}
       </div>
     </div>
-    
+
     <div class="container meta" v-for="(value, key) in metadata.common" :key="key" v-if="showOtherMetadata">
       <span>{{ key }}</span>
       <div class="content">
         {{ printMeta(value) }}
       </div>
     </div>
-    
+
     <div class="container meta" v-for="(value, key) in metadata.native" :key="key" v-if="showOtherMetadata">
       <span>{{ key }}</span>
       <div class="content">
@@ -184,19 +227,19 @@ function printMeta(el) {
       </div>
     </div>
   </div>
-  
+
   <div class="container meta" id="meta-toggle">
     <a class="btn" @click.prevent="showOtherMetadata = !showOtherMetadata">
       {{ showOtherMetadata ? 'See Less Metadata' : 'Show More Metadata' }}
     </a>
   </div>
-  
+
   <div class="container">
     <span>Audio Viewer - Wave + Spectogram</span>
     <div class="content waveform">
       <div ref="waveformRef"></div>
       <div class="options">
-        Zoom: <input max="500" min="10" type="range" value="100"/>
+        Zoom: <input max="500" min="10" type="range" value="10"/>
       </div>
     </div>
   </div>
@@ -221,6 +264,18 @@ function printMeta(el) {
       Made with <3 by Paolones - Using wavesurfer.js
     </div>
   </div>
+
+  <Equalizer
+      v-if="showEqualizer"
+      
+      :close="() => showEqualizer = false"
+      :audio-context="wavesurferAudioContext"
+      :source-node="wavesurferSourceNode"
+      
+      :play="playAudio"
+      :pause="pauseAudio"
+      :is-playing="isPlaying"
+  />
 </template>
 
 <style>
@@ -240,14 +295,14 @@ div.list {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  
+
   max-width: 960px;
-  
+
   gap: 16px;
   padding: 16px;
-  
+
   row-gap: 10px;
-  
+
   & > div.container {
     margin-bottom: 0;
   }
@@ -255,7 +310,7 @@ div.list {
 
 div#meta-toggle {
   background: #6a0fd6;
-  
+
   & > a.btn {
     background: var(--secondary);
     color: var(--secondary-text);
@@ -268,7 +323,7 @@ div.container {
   max-width: 960px;
 
   margin-bottom: 16px;
-  
+
   &.meta {
     max-width: fit-content;
     padding-inline: 16px;

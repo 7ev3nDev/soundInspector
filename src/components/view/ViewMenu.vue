@@ -14,6 +14,7 @@ const audioStore = useAudioStore();
   <a class="btn no-action" v-if="mediaStore.isMobile">
     {{ audioStore.file.name }}
   </a>
+  <a @click="header.emit('openEqualizer')">Equalizer</a>
   <a @click="header.emit('download')">Download .WAV</a>
   <a class="danger" @click="router.push('/')">Close</a>
 </template>
