@@ -7,6 +7,7 @@ const audioStore = useAudioStore();
 const binaryCanvas = ref(null);
 
 const morseCode = ref("");
+const seeAnyway = ref(false);
 
 onMounted(async () => {
   if (audioStore.convertedWavBytes) {
@@ -61,11 +62,20 @@ function drawBinary(binary) {
     {{ morseCode }}
   </template>
   <template v-else>
-    No Morse code detected.
+    {{ seeAnyway ? morseCode : "No Morse code detected." }}
+    
+    <a class="btn" @click="seeAnyway = !seeAnyway">
+      {{ seeAnyway ? "Hide" : "See anyway" }}
+    </a>
   </template>
   
 </template>
 
 <style scoped>
-
+a.btn {
+  margin-top: 4px;
+  height: 32px;
+  min-height: 32px;
+  font-size: 14px;
+}
 </style>

@@ -23,7 +23,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- TODO: move header to another part -->
   <header :class="{ active: route.path === '/view' }">
     <div class="content">
       <h2>soundInspector</h2>
