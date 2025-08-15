@@ -117,7 +117,7 @@ function formatFrequency(freq: number): string {
             <!--               @click.stop="/* TODO */"-->
             <a class="btn mini" id="execute"
                :class="{ 'disabled': isRendering }">
-              {{ isRendering ? 'Rendering...' : 'Load It!' }}
+              {{ isRendering ? 'Rendering...' : 'Inspect It!' }}
             </a>
           </div>
         </div>
@@ -173,22 +173,13 @@ input[type="range"][orient="vertical"]:active {
   cursor: grabbing;
 }
 
-input[type="range"][orient="vertical"]::-webkit-slider-runnable-track {
+input[type="range"][orient="vertical"]::-webkit-slider-runnable-track, input[type="range"][orient="vertical"]::-moz-range-track {
   width: 10px;
   height: 100%;
   background: var(--primary);
   border-radius: 4px;
   border: 1px solid var(--primary-text);
 }
-
-input[type="range"][orient="vertical"]::-moz-range-track {
-  width: 10px;
-  height: 100%;
-  background: var(--primary);
-  border-radius: 4px;
-  border: 1px solid var(--primary-text);
-}
-
 
 input[type="range"][orient="vertical"]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -211,7 +202,6 @@ input[type="range"][orient="vertical"]::-moz-range-thumb {
   border-radius: 2px;
   border: none;
 }
-
 
 .overlay {
   position: absolute;
@@ -326,6 +316,41 @@ input[type="range"][orient="vertical"]::-moz-range-thumb {
 
   & .btn {
     padding-inline: 13.5px
+  }
+}
+
+
+@media screen and (max-width: 600px) {
+  .equalizer > .content {
+    padding: 8px !important;
+  }
+
+  .sliders {
+    gap: 12px;
+  }
+
+  input[type="range"][orient="vertical"] {
+    width: 10px;
+  }
+
+  input[type="range"][orient="vertical"]::-webkit-slider-thumb, input[type="range"][orient="vertical"]::-moz-range-thumb {
+    width: 20px;
+    height: 10px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .sliders {
+    gap: 6px;
+  }
+
+  input[type="range"][orient="vertical"] {
+    width: 8px;
+  }
+
+  input[type="range"][orient="vertical"]::-webkit-slider-thumb, input[type="range"][orient="vertical"]::-moz-range-thumb {
+    width: 16px;
+    height: 8px;
   }
 }
 </style>
