@@ -33,9 +33,10 @@ import {downloadWav} from "@/composables/generalUtils.js";
 const isPlaying = ref(false);
 
 const wavesurferMediaElement = ref(null);
-const wavesurferAudioBuffer = ref(null);
 const wavesurferAudioContext = ref(null);
 const wavesurferSourceNode = ref(null);
+const wavesurferDecodedData = ref(null);
+
 const waveformRef = ref(null)
 /**
  * @type {import('wavesurfer.js').default}
@@ -127,8 +128,8 @@ onMounted(async () => {
             const minPxPerSec = e.target.valueAsNumber
             wavesurfer.zoom(minPxPerSec)
           })
-
-      wavesurferAudioBuffer.value = wavesurfer.getDecodedData();
+      
+      wavesurferDecodedData.value = wavesurfer.getDecodedData()
 
       wavesurferAudioContext.value = new AudioContext();
       wavesurferMediaElement.value = wavesurfer.getMediaElement();
@@ -271,6 +272,7 @@ function pauseAudio() {
       :close="() => showEqualizer = false"
       :audio-context="wavesurferAudioContext"
       :source-node="wavesurferSourceNode"
+      :decoded-data="wavesurferDecodedData"
       
       :play="playAudio"
       :pause="pauseAudio"

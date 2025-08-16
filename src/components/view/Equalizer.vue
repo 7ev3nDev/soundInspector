@@ -4,21 +4,23 @@ import CloseIcon from "@/components/icons/CloseIcon.vue";
 import PlayIcon from "@/components/icons/PlayIcon.vue";
 import PauseIcon from "@/components/icons/PauseIcon.vue";
 import {useAudioStore} from "@/stores/audioStore";
+import {audioBufferToWav, formatFrequency} from "@/composables/audioUtils";
+import {useRouter} from "vue-router";
 
 const audioStore = useAudioStore();
+const router = useRouter();
 const eqBands = audioStore.eqBands;
 
 const props = defineProps<{
   close: () => void,
   audioContext: AudioContext,
   sourceNode: AudioBufferSourceNode,
+  decodedData: AudioBuffer, 
 
   play: () => void,
   pause: () => void,
   isPlaying: boolean,
 }>();
-
-const isRendering = ref(false);
 
 let filters: BiquadFilterNode[] = [];
 onMounted(() => {
@@ -31,7 +33,7 @@ onMounted(() => {
 
   filters = eqBands.map((band, i) => {
     const filter = props.audioContext.createBiquadFilter();
-    filter.type = band <= 32 ? 'lowshelf' : band >= 16000 ? 'highshelf' : 'peaking';
+    filter.type = i == 0 ? 'lowshelf' : band >= 16000 ? 'highshelf' : 'peaking';
     filter.frequency.value = band;
     filter.Q.value = 1;
     filter.gain.value = audioStore.equalizerGains[i];
@@ -40,16 +42,13 @@ onMounted(() => {
 
   props.sourceNode.disconnect();
 
-  const firstFilter = filters[0];
-  const lastFilter = filters[filters.length - 1];
-
-  props.sourceNode.connect(firstFilter);
+  props.sourceNode.connect(filters[0]);
 
   for (let i = 0; i < filters.length - 1; i++) {
     filters[i].connect(filters[i + 1]);
   }
 
-  lastFilter.connect(props.audioContext.destination);
+  filters[filters.length - 1].connect(props.audioContext.destination);
 });
 
 onUnmounted(() => {
@@ -74,9 +73,57 @@ function togglePlayPause() {
   }
 }
 
-function formatFrequency(freq: number): string {
-  return freq >= 1000 ? `${freq / 1000}k` : `${freq}`;
+const isRendering = ref(false);
+
+async function inspectIt() {
+  isRendering.value = true;
+  
+  try {
+    const originalBuffer = props.decodedData;
+    const offlineCtx = new OfflineAudioContext(
+      originalBuffer.numberOfChannels,
+      originalBuffer.length,
+      originalBuffer.sampleRate
+    );
+    
+    const offlineSOurce = offlineCtx.createBufferSource();
+    offlineSOurce.buffer = originalBuffer;
+    
+    const offlineFilters = eqBands.map((band, i) => {
+      const filter = offlineCtx.createBiquadFilter();
+      filter.type = i == 0 ? 'lowshelf' : band >= 16000 ? 'highshelf' : 'peaking';
+      filter.frequency.value = band;
+      filter.Q.value = 1;
+      filter.gain.value = audioStore.equalizerGains[i];
+      return filter;
+    });
+
+    offlineSOurce.connect(offlineFilters[0]);
+    for (let i = 0; i < offlineFilters.length - 1; i++) {
+      offlineFilters[i].connect(offlineFilters[i + 1]);
+    }
+    offlineFilters[offlineFilters.length - 1].connect(offlineCtx.destination);
+    
+    offlineSOurce.start(0);
+    const renderedBuffer = await offlineCtx.startRendering();
+    
+    const wavBuffer = audioBufferToWav(renderedBuffer);
+    const fileToReprocess = new File([wavBuffer], audioStore.file.name.replace(/\.[^/.]+$/, '') + '-eq.wav', {
+      type: 'audio/wav',
+    });
+    
+    audioStore.setFileToReprocess(fileToReprocess);
+    
+    props.close();
+    
+    await router.push('/');
+  } catch (error) {
+    console.error("Error during rendering:", error);
+  } finally {
+    isRendering.value = false;
+  }
 }
+
 </script>
 
 <template>
@@ -114,8 +161,8 @@ function formatFrequency(freq: number): string {
             </a>
           </div>
           <div class="right">
-            <!--               @click.stop="/* TODO */"-->
             <a class="btn mini" id="execute"
+               @click.stop="inspectIt"
                :class="{ 'disabled': isRendering }">
               {{ isRendering ? 'Rendering...' : 'Inspect It!' }}
             </a>

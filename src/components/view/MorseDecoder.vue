@@ -59,7 +59,7 @@ function drawBinary(binary) {
 <template>
   <template v-if="!morseCode.includes('?')">
     <canvas ref="binaryCanvas" height="50"></canvas>
-    {{ morseCode }}
+    {{ morseCode || "Nothing found" }}
   </template>
   <template v-else>
     {{ seeAnyway ? morseCode : "No Morse code detected." }}

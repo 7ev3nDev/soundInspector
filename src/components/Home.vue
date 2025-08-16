@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {useAudioStore} from "@/stores/audioStore.ts";
 import FileIcon from "@/components/icons/FileIcon.vue";
@@ -93,6 +93,14 @@ const handleDrop = (event) => {
 
   handleFile(file);
 };
+
+onMounted(() => {
+  const fileToReprocess = audioStore.fileToReprocess;
+  if (fileToReprocess) {
+    handleFile(fileToReprocess);
+    audioStore.setFileToReprocess(null);
+  }
+})
 
 </script>
 

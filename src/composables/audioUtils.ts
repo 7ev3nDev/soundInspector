@@ -131,3 +131,66 @@ function mode(arr: number[]): number {
     }
     return +Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
 }
+
+export function formatFrequency(freq: number): string {
+    return freq >= 1000 ? `${freq / 1000}k` : `${freq}`;
+}
+
+/**
+ * Encodes an AudioBuffer into a WAV file format (Uint8Array).
+ * @param {AudioBuffer} buffer The audio buffer to encode.
+ * @returns {Uint8Array} A Uint8Array representing the WAV file.
+ * 
+ * Modified https://gist.github.com/Daninet/22edc59cf2aee0b9a90c18e553e49297 with help from Gemini 2.5
+ */
+export function audioBufferToWav(buffer) {
+    const numOfChan = buffer.numberOfChannels;
+    const length = buffer.length * numOfChan * 2 + 44;
+    const view = new DataView(new ArrayBuffer(length));
+    const channels = [];
+    let i;
+    let sample;
+    let offset = 0;
+    let pos = 0;
+    
+    const setUint16 = (data) => {
+        view.setUint16(pos, data, true);
+        pos += 2;
+    };
+    const setUint32 = (data) => {
+        view.setUint32(pos, data, true);
+        pos += 4;
+    };
+    
+    setUint32(0x46464952);
+    setUint32(length - 8);
+    setUint32(0x45564157);
+    
+    setUint32(0x20746d66);
+    setUint32(16);
+    setUint16(1);
+    setUint16(numOfChan);
+    setUint32(buffer.sampleRate);
+    setUint32(buffer.sampleRate * 2 * numOfChan);
+    setUint16(numOfChan * 2);
+    setUint16(16);
+    
+    setUint32(0x61746164);
+    setUint32(length - pos - 4);
+    
+    for (i = 0; i < buffer.numberOfChannels; i++) {
+        channels.push(buffer.getChannelData(i));
+    }
+
+    while (pos < length) {
+        for (i = 0; i < numOfChan; i++) {
+            sample = Math.max(-1, Math.min(1, channels[i][offset]));
+            sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
+            view.setInt16(pos, sample, true);
+            pos += 2;
+        }
+        offset++;
+    }
+
+    return new Uint8Array(view.buffer);
+}

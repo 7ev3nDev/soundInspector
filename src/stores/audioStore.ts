@@ -45,6 +45,11 @@ export const useAudioStore = defineStore('audio', () => {
         }
         equalizerGains.value[index] = value;
     }
+    
+    function setFileToReprocess(file: File) {
+        clear();
+        fileToReprocess.value = file;
+    }
 
     return {
         file,
@@ -58,6 +63,7 @@ export const useAudioStore = defineStore('audio', () => {
         equalizerGains,
         setFile,
         clear,
-        updateEqualizerGain
+        updateEqualizerGain,
+        setFileToReprocess
     }
 })
