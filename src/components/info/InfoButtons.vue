@@ -4,7 +4,7 @@ import BackIcon from "@/components/icons/BackIcon.vue";
 
 <template>
   <RouterLink to="/" class="btn">
-    <BackIcon />
+    <BackIcon/>
   </RouterLink>
 </template>
 

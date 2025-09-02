@@ -1,38 +1,34 @@
 <script setup>
-import {onMounted, ref} from 'vue';
-import {useRouter} from 'vue-router';
-import {useAudioStore} from "@/stores/audioStore.ts";
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAudioStore } from "@/stores/audioStore.ts";
 import FileIcon from "@/components/icons/FileIcon.vue";
-import {convertToWav} from "@/composables/useFFmpeg.js";
-import {useMediaStore} from "@/stores/mediaStore.js";
-import {escapeHTML} from "@/composables/generalUtils.js";
-import {useTourStore} from "@/stores/tourStore.js";
+import { convertToWav } from "@/composables/useFFmpeg.js";
+import { useMediaStore } from "@/stores/mediaStore.js";
+import { checkValidity, escapeHTML } from "@/composables/generalUtils.js";
+import { useTourStore } from "@/stores/tourStore.js";
 
 const router = useRouter();
-const invalidFile = ref(false);
-const dragOver = ref(false);
-const loading = ref(false);
-
 const audioStore = useAudioStore();
 const mediaStore = useMediaStore();
 const tourStore = useTourStore();
 
-function checkValidity(type) {
-  return type.startsWith("audio/");
-}
+const invalidFile = ref(false);
+const dragOver = ref(false);
+const loading = ref(false);
 
 /**
  * @param file {File}
  */
 function handleFile(file) {
-  if (!checkValidity(file.type)) {
+  if ( !checkValidity(file.type) ) {
     invalidFile.value = true;
     dragOver.value = false;
     return;
   } else {
     invalidFile.value = false;
   }
-  
+
   loading.value = true;
 
   const reader = new FileReader();
@@ -57,19 +53,13 @@ function handleFile(file) {
   reader.readAsArrayBuffer(file);
 }
 
-const handleFileChange = (event) => {
-  const file = event.target.files[0];
-
-  handleFile(file);
-};
-
 const handleDragOver = (event) => {
   event.preventDefault();
 
-  if (event.dataTransfer.items && event.dataTransfer.items.length > 0) {
+  if ( event.dataTransfer.items && event.dataTransfer.items.length > 0 ) {
     const fileType = event.dataTransfer.items[0].type;
 
-    if (!checkValidity(fileType)) {
+    if ( !checkValidity(fileType) ) {
       invalidFile.value = true;
       dragOver.value = false;
       loading.value = false;
@@ -98,12 +88,12 @@ const handleDrop = (event) => {
 
 onMounted(() => {
   const fileToReprocess = audioStore.fileToReprocess;
-  if (fileToReprocess) {
+  if ( fileToReprocess ) {
     handleFile(fileToReprocess);
     audioStore.setFileToReprocess(null);
   }
-  
-  if (tourStore.started) {
+
+  if ( tourStore.started ) {
     tourStore.continueTour([
       {
         element: 'main > .container',
@@ -119,7 +109,7 @@ onMounted(() => {
             testButton.addEventListener('click', async () => {
               const response = await fetch('/sample.wav');
               const blob = await response.blob();
-              const file = new File([blob], "sample.wav", { type: "audio/wav" });
+              const file = new File([ blob ], "sample.wav", { type: "audio/wav" });
               handleFile(file);
               tourStore.pauseTour()
             })
@@ -154,7 +144,8 @@ onMounted(() => {
       </h2>
       <p>We support any audio file supported by ffmpeg</p>
     </label>
-    <input type="file" name="audio_file" id="audio_file" accept="audio/*" @change="handleFileChange" :disabled="loading" />
+    <input type="file" name="audio_file" id="audio_file" accept="audio/*"
+           @change="event => handleFile(event.target.files[0])" :disabled="loading"/>
   </div>
 </template>
 
@@ -166,7 +157,7 @@ div.container {
   & > input[type="file"] {
     display: none;
   }
-  
+
   & > .loading.content {
     align-items: center;
     justify-content: center;
@@ -174,7 +165,7 @@ div.container {
     & > h2 {
       font-size: 3rem;
     }
-    
+
     & > p {
       width: fit-content;
     }

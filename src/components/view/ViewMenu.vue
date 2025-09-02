@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {useHeaderStore} from "@/stores/headerStore";
-import {useRouter} from "vue-router";
-import {useAudioStore} from "@/stores/audioStore.ts";
-import {useMediaStore} from "@/stores/mediaStore";
+import { useHeaderStore } from "@/stores/headerStore";
+import { useRouter } from "vue-router";
+import { useAudioStore } from "@/stores/audioStore.ts";
+import { useMediaStore } from "@/stores/mediaStore";
 
 const router = useRouter();
 const header = useHeaderStore();
@@ -22,9 +22,9 @@ const audioStore = useAudioStore();
 <style scoped>
 a.danger {
   background-color: var(--error);
-  
+
   &:hover {
-    background-color: var(--error-hover)!important;
+    background-color: var(--error-hover) !important;
   }
 }
 </style>

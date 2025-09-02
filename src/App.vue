@@ -1,8 +1,8 @@
 <script setup>
 import InfoIcon from "@/components/icons/InfoIcon.vue";
-import {useRoute} from 'vue-router'
-import {useHeaderStore} from "@/stores/headerStore.js";
-import {onMounted} from "vue";
+import { useRoute } from 'vue-router'
+import { useHeaderStore } from "@/stores/headerStore.js";
+import { onMounted } from "vue";
 
 const route = useRoute()
 
@@ -10,7 +10,7 @@ const headerStore = useHeaderStore();
 
 onMounted(() => {
   document.querySelector("body").onclick = e => {
-    if (headerStore.isMenuOpen && !e.target.closest("div.menu") && !e.target.closest("header") && !document.body.classList.contains("driver-active")) {
+    if ( headerStore.isMenuOpen && !e.target.closest("div.menu") && !e.target.closest("header") && !document.body.classList.contains("driver-active") ) {
       headerStore.setIsMenuOpen(false);
     }
   }
@@ -63,7 +63,7 @@ header > div.menu {
   padding: 11px 24px;
 
   z-index: 10001;
-  pointer-events: all!important;
+  pointer-events: all !important;
 
   &.open {
     display: block;

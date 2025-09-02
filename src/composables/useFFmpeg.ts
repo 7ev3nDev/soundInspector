@@ -1,10 +1,10 @@
 // This file has been done by aistudio.google.com -
 // input from the template at https://github.com/ffmpegwasm/vue-app/blob/main/src/App.vue
 
-import {FFmpeg} from '@ffmpeg/ffmpeg';
-import type {LogEvent, ProgressEvent} from '@ffmpeg/ffmpeg/dist/esm/types';
-import {toBlobURL} from '@ffmpeg/util';
-import {readonly, ref, type Ref} from 'vue';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import type { LogEvent, ProgressEvent } from '@ffmpeg/ffmpeg/dist/esm/types';
+import { toBlobURL } from '@ffmpeg/util';
+import { readonly, ref, type Ref } from 'vue';
 
 const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core-mt@0.12.9/dist/esm';
 
@@ -148,17 +148,17 @@ export async function convertToWav(
         console.warn('Input is already in WAV format, returning original data.');
         return audioData;
     }
-    
+
     const { isReady, load, exec, writeFile, readFile } = useFFmpeg();
 
     if (!isReady.value) {
         await load();
     }
-    
+
     await writeFile(inputFilename, audioData);
-    await exec(['-y', '-i', inputFilename, outputFilename]);
+    await exec([ '-y', '-i', inputFilename, outputFilename ]);
 
     // console.info(logs.value.join("\n"));
-    
+
     return await readFile(outputFilename);
 }

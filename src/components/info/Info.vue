@@ -1,9 +1,9 @@
 <script setup>
 
-import {onMounted, onUnmounted, shallowRef} from "vue";
+import { onMounted, onUnmounted, shallowRef } from "vue";
 import InfoButtons from "@/components/info/InfoButtons.vue";
-import {useHeaderStore} from "@/stores/headerStore.js";
-import {useTourStore} from "@/stores/tourStore.js";
+import { useHeaderStore } from "@/stores/headerStore.js";
+import { useTourStore } from "@/stores/tourStore.js";
 
 const viewButtons = shallowRef(InfoButtons);
 const headerStore = useHeaderStore();

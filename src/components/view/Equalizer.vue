@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref} from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import CloseIcon from "@/components/icons/CloseIcon.vue";
 import PlayIcon from "@/components/icons/PlayIcon.vue";
 import PauseIcon from "@/components/icons/PauseIcon.vue";
-import {useAudioStore} from "@/stores/audioStore";
-import {audioBufferToWav, formatFrequency} from "@/composables/audioUtils";
-import {useRouter} from "vue-router";
+import { useAudioStore } from "@/stores/audioStore";
+import { audioBufferToWav, formatFrequency } from "@/composables/audioUtils";
+import { useRouter } from "vue-router";
 
 const audioStore = useAudioStore();
 const router = useRouter();
@@ -15,7 +15,7 @@ const props = defineProps<{
   close: () => void,
   audioContext: AudioContext,
   sourceNode: AudioBufferSourceNode,
-  decodedData: AudioBuffer, 
+  decodedData: AudioBuffer,
 
   play: () => void,
   pause: () => void,
@@ -77,18 +77,18 @@ const isRendering = ref(false);
 
 async function inspectIt() {
   isRendering.value = true;
-  
+
   try {
     const originalBuffer = props.decodedData;
     const offlineCtx = new OfflineAudioContext(
-      originalBuffer.numberOfChannels,
-      originalBuffer.length,
-      originalBuffer.sampleRate
+        originalBuffer.numberOfChannels,
+        originalBuffer.length,
+        originalBuffer.sampleRate
     );
-    
+
     const offlineSOurce = offlineCtx.createBufferSource();
     offlineSOurce.buffer = originalBuffer;
-    
+
     const offlineFilters = eqBands.map((band, i) => {
       const filter = offlineCtx.createBiquadFilter();
       filter.type = i == 0 ? 'lowshelf' : band >= 16000 ? 'highshelf' : 'peaking';
@@ -103,19 +103,19 @@ async function inspectIt() {
       offlineFilters[i].connect(offlineFilters[i + 1]);
     }
     offlineFilters[offlineFilters.length - 1].connect(offlineCtx.destination);
-    
+
     offlineSOurce.start(0);
     const renderedBuffer = await offlineCtx.startRendering();
-    
+
     const wavBuffer = audioBufferToWav(renderedBuffer);
-    const fileToReprocess = new File([wavBuffer], audioStore.file.name.replace(/\.[^/.]+$/, '') + '-eq.wav', {
+    const fileToReprocess = new File([ wavBuffer ], audioStore.file.name.replace(/\.[^/.]+$/, '') + '-eq.wav', {
       type: 'audio/wav',
     });
-    
+
     audioStore.setFileToReprocess(fileToReprocess);
-    
+
     props.close();
-    
+
     await router.push('/');
   } catch (error) {
     console.error("Error during rendering:", error);

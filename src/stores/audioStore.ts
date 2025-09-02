@@ -1,8 +1,8 @@
-import {defineStore} from 'pinia'
-import {ref} from 'vue'
-import {getWavDuration} from "../composables/audioUtils";
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { getWavDuration } from "../composables/audioUtils";
 
-const eqBands = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
+const eqBands = [ 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000 ];
 const equalizerGains = ref<number[]>(eqBands.map(() => 0));
 
 export const useAudioStore = defineStore('audio', () => {
@@ -37,7 +37,7 @@ export const useAudioStore = defineStore('audio', () => {
         decodedText.value = ''
         duration.value = 0
     }
-    
+
     function updateEqualizerGain(index: number, value: number) {
         if (index < 0 || index >= equalizerGains.value.length) {
             console.warn(`Invalid EQ band index: ${index}`);
@@ -45,7 +45,7 @@ export const useAudioStore = defineStore('audio', () => {
         }
         equalizerGains.value[index] = value;
     }
-    
+
     function setFileToReprocess(file: File) {
         clear();
         fileToReprocess.value = file;

@@ -9,7 +9,7 @@ export function escapeHTML(str: string): string {
 }
 
 export function downloadWav(uint8array, filename = 'output.wav') {
-    const blob = new Blob([uint8array], {type: 'audio/wav'});
+    const blob = new Blob([ uint8array ], { type: 'audio/wav' });
 
     const url = URL.createObjectURL(blob);
 
@@ -23,4 +23,8 @@ export function downloadWav(uint8array, filename = 'output.wav') {
     document.body.removeChild(a);
 
     URL.revokeObjectURL(url);
+}
+
+export function checkValidity(type) {
+    return type.startsWith("audio/");
 }

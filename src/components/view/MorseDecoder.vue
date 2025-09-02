@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useAudioStore } from "@/stores/audioStore.ts";
 import { decodeMorseFromBinary } from "@/composables/audioUtils.js";
-  
+
 const audioStore = useAudioStore();
 const binaryCanvas = ref(null);
 
@@ -24,9 +24,9 @@ onMounted(async () => {
     const envelope = samples.map(Math.abs);
     const threshold = 0.3;
     const binary = envelope.map(v => (v > threshold ? 1 : 0));
-    
+
     drawBinary(binary);
-    
+
     morseCode.value = await decodeMorseFromBinary(binary);
   }
 });
@@ -63,12 +63,12 @@ function drawBinary(binary) {
   </template>
   <template v-else>
     {{ seeAnyway ? morseCode : "No Morse code detected." }}
-    
+
     <a class="btn" @click="seeAnyway = !seeAnyway">
       {{ seeAnyway ? "Hide" : "See anyway" }}
     </a>
   </template>
-  
+
 </template>
 
 <style scoped>

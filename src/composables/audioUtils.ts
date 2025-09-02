@@ -7,7 +7,7 @@ export function getWavDuration(wavByteArray: Uint8Array): number | null {
     if (wavByteArray.length < 44) return null;
 
     const view = new DataView(wavByteArray.buffer);
-    
+
     if (view.getUint32(0, false) !== 0x52494646 || view.getUint32(8, false) !== 0x57415645) {
         console.error("Not a valid RIFF/WAVE file.");
         return null;
@@ -15,22 +15,22 @@ export function getWavDuration(wavByteArray: Uint8Array): number | null {
 
     const byteRate = view.getUint32(28, true);
     if (byteRate === 0) return null;
-    
+
     let pos = 12;
     while (pos < view.byteLength - 8) {
         const chunkId = view.getUint32(pos, false);
         const chunkSize = view.getUint32(pos + 4, true);
-        
+
         if (chunkId === 0x64617461) {
             return chunkSize / byteRate;
         }
-        
+
         pos += 8 + chunkSize;
         if (chunkSize % 2 !== 0) {
             pos += 1;
         }
     }
-    
+
     console.error("Could not find the 'data' chunk in the WAV file.");
     return null;
 }
@@ -48,7 +48,7 @@ const MORSE_DICT = {
 
 /**
  * Decodes a Morse code message from a WAV audio file.
- * Made with help from AI. 
+ * Made with help from AI.
  * @param wavBytes
  */
 export async function decodeMorseFromWav(wavBytes: Uint8Array): Promise<string> {
@@ -140,7 +140,7 @@ export function formatFrequency(freq: number): string {
  * Encodes an AudioBuffer into a WAV file format (Uint8Array).
  * @param {AudioBuffer} buffer The audio buffer to encode.
  * @returns {Uint8Array} A Uint8Array representing the WAV file.
- * 
+ *
  * Modified https://gist.github.com/Daninet/22edc59cf2aee0b9a90c18e553e49297 with help from Gemini 2.5
  */
 export function audioBufferToWav(buffer) {
@@ -152,7 +152,7 @@ export function audioBufferToWav(buffer) {
     let sample;
     let offset = 0;
     let pos = 0;
-    
+
     const setUint16 = (data) => {
         view.setUint16(pos, data, true);
         pos += 2;
@@ -161,11 +161,11 @@ export function audioBufferToWav(buffer) {
         view.setUint32(pos, data, true);
         pos += 4;
     };
-    
+
     setUint32(0x46464952);
     setUint32(length - 8);
     setUint32(0x45564157);
-    
+
     setUint32(0x20746d66);
     setUint32(16);
     setUint16(1);
@@ -174,10 +174,10 @@ export function audioBufferToWav(buffer) {
     setUint32(buffer.sampleRate * 2 * numOfChan);
     setUint16(numOfChan * 2);
     setUint16(16);
-    
+
     setUint32(0x61746164);
     setUint32(length - pos - 4);
-    
+
     for (i = 0; i < buffer.numberOfChannels; i++) {
         channels.push(buffer.getChannelData(i));
     }

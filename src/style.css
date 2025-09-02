@@ -5,20 +5,19 @@ body {
     --back-transp: 0.85;
     background: repeating-conic-gradient(
             rgba(0, 4, 76, var(--back-transp)) 0 25%,
-            rgba(45, 0, 74, var(--back-transp)) 0 50%)
-            50% / 30px 30px;
+            rgba(45, 0, 74, var(--back-transp)) 0 50%) 50% / 30px 30px;
     color: white;
-    
+
     padding: 0;
     margin: 0;
-    
+
     min-height: 100vh;
     box-sizing: border-box;
-    
+
     --primary: #4C29EB;
     --primary-text: #FFF;
     --primary-hover: #2f12b6;
-    
+
     --secondary: #EDE9FD;
     --secondary-text: #000;
     --secondary-hover: #948eaf;
@@ -48,7 +47,7 @@ div#app {
     min-height: 100vh;
 
     gap: 10px;
-    
+
     &.active {
         justify-content: start;
     }
@@ -86,10 +85,10 @@ div.container {
         padding-inline: 30px;
 
         transition: all 0.2s;
-        
+
         max-height: 300px;
         overflow-y: auto;
-        
+
         & p {
             word-break: break-all;
             width: 100%;

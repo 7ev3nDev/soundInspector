@@ -1,19 +1,19 @@
 <script setup>
-import {useAudioStore} from "@/stores/audioStore.ts";
-import {useRouter} from "vue-router";
-import {onMounted, onUnmounted, shallowRef } from "vue";
-import {useHeaderStore} from "@/stores/headerStore.js";
-import {useTourStore} from "@/stores/tourStore.js";
+import { useAudioStore } from "@/stores/audioStore.ts";
+import { useRouter } from "vue-router";
+import { onMounted, onUnmounted, shallowRef } from "vue";
+import { useHeaderStore } from "@/stores/headerStore.js";
+import { useTourStore } from "@/stores/tourStore.js";
 import ViewMenu from "@/components/view/ViewMenu.vue";
-import {ref} from 'vue'
-import {parseBuffer} from 'music-metadata';
+import { ref } from 'vue'
+import { parseBuffer } from 'music-metadata';
 
 const audioStore = useAudioStore();
 const headerStore = useHeaderStore();
 const tourStore = useTourStore();
 const router = useRouter();
 
-if (!audioStore.file) {
+if ( !audioStore.file ) {
   router.push("/");
 }
 
@@ -30,7 +30,7 @@ import HoverPlugin from 'https://unpkg.com/wavesurfer.js@7/dist/plugins/hover.es
 import MorseDecoder from "@/components/view/MorseDecoder.vue";
 import ViewButtons from "@/components/view/ViewButtons.vue";
 import Equalizer from "@/components/view/Equalizer.vue";
-import {downloadWav} from "@/composables/generalUtils.js";
+import { downloadWav } from "@/composables/generalUtils.js";
 
 const isPlaying = ref(false);
 
@@ -58,8 +58,8 @@ const showEqualizer = ref(false);
 
 onMounted(async () => {
   document.querySelector("div#app").classList.add("active");
-  
-  if (tourStore.started) {
+
+  if ( tourStore.started ) {
     tourStore.continueTour([
       {
         popover: {
@@ -120,7 +120,7 @@ onMounted(async () => {
       }
     ])
   }
-  
+
   headerStore.setMenuContent({
     component: viewMenu,
     props: {}
@@ -134,7 +134,7 @@ onMounted(async () => {
       downloadWav(audioStore.convertedWavBytes, audioStore.name);
     },
     openEqualizer: () => {
-      if (!wavesurferSourceNode.value) {
+      if ( !wavesurferSourceNode.value ) {
         console.error("Audio graph not ready yet!");
         return;
       }
@@ -142,9 +142,9 @@ onMounted(async () => {
       headerStore.setIsMenuOpen(false);
     }
   })
-  
-  if (audioStore.convertedWavBytes) {
-    const blob = new Blob([audioStore.convertedWavBytes], {type: 'audio/wav'})
+
+  if ( audioStore.convertedWavBytes ) {
+    const blob = new Blob([ audioStore.convertedWavBytes ], { type: 'audio/wav' })
     const url = URL.createObjectURL(blob)
 
     wavesurfer = WaveSurfer.create({
@@ -192,7 +192,7 @@ onMounted(async () => {
             const minPxPerSec = e.target.valueAsNumber
             wavesurfer.zoom(minPxPerSec)
           })
-      
+
       wavesurferDecodedData.value = wavesurfer.getDecodedData()
 
       wavesurferAudioContext.value = new AudioContext();
@@ -224,13 +224,13 @@ onUnmounted(() => {
   document.querySelector("div#app").classList.remove("active");
   headerStore.clear()
   audioStore.clear()
-  if (wavesurfer) {
+  if ( wavesurfer ) {
     wavesurfer.destroy();
     wavesurfer = null;
   }
 
-  if (wavesurferAudioContext.value) {
-    if (wavesurferSourceNode.value) {
+  if ( wavesurferAudioContext.value ) {
+    if ( wavesurferSourceNode.value ) {
       wavesurferSourceNode.value.disconnect();
       wavesurferSourceNode.value = null;
     }
@@ -241,14 +241,14 @@ onUnmounted(() => {
 })
 
 function printMeta(el) {
-  if (Array.isArray(el)) {
+  if ( Array.isArray(el) ) {
     return el.map((item) => {
-      if (typeof item === 'object') {
+      if ( typeof item === 'object' ) {
         return JSON.stringify(item, null, 2);
       }
       return item;
     }).join(', ') || 'Empty Array';
-  } else if (typeof el === 'object') {
+  } else if ( typeof el === 'object' ) {
     return JSON.stringify(el, null, 2);
   } else {
     return el;
@@ -256,13 +256,13 @@ function printMeta(el) {
 }
 
 function playAudio() {
-  if (wavesurfer) {
+  if ( wavesurfer ) {
     wavesurfer.play();
   }
 }
 
 function pauseAudio() {
-  if (wavesurfer) {
+  if ( wavesurfer ) {
     wavesurfer.pause();
   }
 }
@@ -332,12 +332,12 @@ function pauseAudio() {
 
   <Equalizer
       v-if="showEqualizer"
-      
+
       :close="() => showEqualizer = false"
       :audio-context="wavesurferAudioContext"
       :source-node="wavesurferSourceNode"
       :decoded-data="wavesurferDecodedData"
-      
+
       :play="playAudio"
       :pause="pauseAudio"
       :is-playing="isPlaying"
