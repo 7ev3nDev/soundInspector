@@ -1,20 +1,16 @@
 <script setup>
 import InfoIcon from "@/components/icons/InfoIcon.vue";
-import { useRoute } from 'vue-router'
-import { useAudioStore } from "@/stores/audioStore.ts";
-import MoreIcon from "@/components/icons/MoreIcon.vue";
-import BackIcon from "@/components/icons/BackIcon.vue";
+import {useRoute} from 'vue-router'
 import {useHeaderStore} from "@/stores/headerStore.js";
 import {onMounted} from "vue";
 
 const route = useRoute()
 
-const audioStore = useAudioStore();
 const headerStore = useHeaderStore();
 
 onMounted(() => {
   document.querySelector("body").onclick = e => {
-    if (headerStore.isMenuOpen && !e.target.closest("div.menu") && !e.target.closest("header")) {
+    if (headerStore.isMenuOpen && !e.target.closest("div.menu") && !e.target.closest("header") && !document.body.classList.contains("driver-active")) {
       headerStore.setIsMenuOpen(false);
     }
   }
@@ -27,22 +23,22 @@ onMounted(() => {
     <div class="content">
       <h2>soundInspector</h2>
       <div class="btns">
-        <component :is="headerStore.buttonsContent.component" v-bind="headerStore.buttonsContent.props" />
+        <component :is="headerStore.buttonsContent.component" v-bind="headerStore.buttonsContent.props"/>
 
         <RouterLink to="/info" class="btn" v-if="route.path === '/'">
-          <InfoIcon />
+          <InfoIcon/>
         </RouterLink>
       </div>
     </div>
-    <div class="menu" :class="{ open: headerStore.isMenuOpen }">
+    <div class="menu" :class="{ open: headerStore.isMenuOpen }" id="floating-menu">
       <div class="content">
-        <component :is="headerStore.menuContent.component" v-bind="headerStore.menuContent.props" />
+        <component :is="headerStore.menuContent.component" v-bind="headerStore.menuContent.props"/>
       </div>
     </div>
   </header>
 
   <main>
-    <RouterView />
+    <RouterView/>
   </main>
 </template>
 
@@ -66,8 +62,9 @@ header > div.menu {
   border-radius: 32px;
   padding: 11px 24px;
 
-  z-index: 1000;
-  
+  z-index: 10001;
+  pointer-events: all!important;
+
   &.open {
     display: block;
   }
@@ -77,10 +74,10 @@ header > div.menu {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    
+
     gap: 10px;
     padding-block: 2px;
-    
+
     height: 100%;
     width: 100%;
 
@@ -106,7 +103,7 @@ header > div.menu {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      
+
       &.no-action {
         cursor: default;
       }
@@ -127,41 +124,41 @@ header {
   max-width: 800px;
   box-sizing: border-box;
   position: relative;
-  
+
   padding: 11px 30px;
-  
+
   background: var(--primary);
   color: white;
-  
+
   border-radius: 32px;
-  
+
   font-family: Jaro, sans-serif;
-  
+
   box-shadow: rgba(0, 0, 0, 0.4) 0 2px 8px 0;
-  
+
   &.active {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
-  
+
   & > div.content {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    
+
     height: 100%;
-    
+
     background: var(--secondary);
     color: var(--secondary-text);
-    
+
     border-radius: 22px;
     padding-inline: 30px;
-    
+
     & > h2 {
       font-size: 46px;
     }
-    
+
     & > .btns {
       display: flex;
       flex-direction: row;
@@ -169,7 +166,7 @@ header {
       gap: 10px;
     }
   }
-  
+
 }
 
 

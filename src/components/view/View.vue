@@ -1,14 +1,16 @@
 <script setup>
 import {useAudioStore} from "@/stores/audioStore.ts";
 import {useRouter} from "vue-router";
-import {onMounted, onUnmounted, shallowRef, watch} from "vue";
+import {onMounted, onUnmounted, shallowRef } from "vue";
 import {useHeaderStore} from "@/stores/headerStore.js";
+import {useTourStore} from "@/stores/tourStore.js";
 import ViewMenu from "@/components/view/ViewMenu.vue";
 import {ref} from 'vue'
 import {parseBuffer} from 'music-metadata';
 
 const audioStore = useAudioStore();
 const headerStore = useHeaderStore();
+const tourStore = useTourStore();
 const router = useRouter();
 
 if (!audioStore.file) {
@@ -56,6 +58,69 @@ const showEqualizer = ref(false);
 
 onMounted(async () => {
   document.querySelector("div#app").classList.add("active");
+  
+  if (tourStore.started) {
+    tourStore.continueTour([
+      {
+        popover: {
+          title: 'Welcome to the viewer!',
+          description: 'Here you can see the audio waveform, spectrogram and metadata.',
+        }
+      },
+      {
+        element: '#metadata-list',
+        popover: {
+          title: 'Metadata',
+          description: 'Here you can see the metadata of the audio file. Click on "Show More Metadata" to see all the metadata.',
+          position: 'bottom'
+        }
+      },
+      {
+        element: '#waveform-container',
+        popover: {
+          title: 'Waveform and Spectrogram',
+          description: 'Here you can see the audio waveform and spectrogram.<br> You can zoom in and out using the slider.<br><br>You can also play/pause the audio using the controls below the waveform. And move by clicking the waveform!',
+          position: 'top'
+        }
+      },
+      {
+        element: '#decoded-text-container',
+        popover: {
+          title: 'Decoded Text',
+          description: 'Here you can see any decoded text from the audio file, if available.',
+          position: 'top'
+        }
+      },
+      {
+        element: '#morse-code-container',
+        popover: {
+          title: 'Morse Code Decoder',
+          description: 'This section attempts to decode any Morse code present in the audio file.',
+          position: 'top',
+          onNextClick: () => {
+            headerStore.setIsMenuOpen(true);
+            console.log(typeof tourStore.driverObj, tourStore.driverObj)
+            tourStore.driverObj.moveNext();
+          }
+        },
+      },
+      {
+        element: '#floating-menu',
+        popover: {
+          title: 'Menu and Buttons',
+          description: 'Use the menu and buttons to access additional features like downloading the audio or opening the equalizer.',
+          position: 'left',
+        },
+      },
+      {
+        popover: {
+          title: 'Enjoy!',
+          description: 'Feel free to explore the audio file and its metadata. You can also use the equalizer to adjust the sound.',
+        }
+      }
+    ])
+  }
+  
   headerStore.setMenuContent({
     component: viewMenu,
     props: {}
@@ -77,8 +142,7 @@ onMounted(async () => {
       headerStore.setIsMenuOpen(false);
     }
   })
-
-
+  
   if (audioStore.convertedWavBytes) {
     const blob = new Blob([audioStore.convertedWavBytes], {type: 'audio/wav'})
     const url = URL.createObjectURL(blob)
@@ -206,7 +270,7 @@ function pauseAudio() {
 </script>
 
 <template>
-  <div class="list" v-if="metadata?.format">
+  <div class="list" v-if="metadata?.format" id="metadata-list">
     <div class="container meta" v-for="(value, key) in metadata.format" :key="key">
       <span>{{ key }}</span>
       <div class="content">
@@ -235,7 +299,7 @@ function pauseAudio() {
     </a>
   </div>
 
-  <div class="container">
+  <div class="container" id="waveform-container">
     <span>Audio Viewer - Wave + Spectogram</span>
     <div class="content waveform">
       <div ref="waveformRef"></div>
@@ -245,14 +309,14 @@ function pauseAudio() {
     </div>
   </div>
 
-  <div class="container">
+  <div class="container" id="decoded-text-container">
     <span>Strings</span>
     <div class="content">
       <p v-html="audioStore.decodedText"></p>
     </div>
   </div>
 
-  <div class="container credits">
+  <div class="container credits" id="morse-code-container">
     <span>Morse Code</span>
     <div class="content ">
       <MorseDecoder/>

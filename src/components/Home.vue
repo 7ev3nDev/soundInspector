@@ -6,6 +6,7 @@ import FileIcon from "@/components/icons/FileIcon.vue";
 import {convertToWav} from "@/composables/useFFmpeg.js";
 import {useMediaStore} from "@/stores/mediaStore.js";
 import {escapeHTML} from "@/composables/generalUtils.js";
+import {useTourStore} from "@/stores/tourStore.js";
 
 const router = useRouter();
 const invalidFile = ref(false);
@@ -14,6 +15,7 @@ const loading = ref(false);
 
 const audioStore = useAudioStore();
 const mediaStore = useMediaStore();
+const tourStore = useTourStore();
 
 function checkValidity(type) {
   return type.startsWith("audio/");
@@ -99,6 +101,32 @@ onMounted(() => {
   if (fileToReprocess) {
     handleFile(fileToReprocess);
     audioStore.setFileToReprocess(null);
+  }
+  
+  if (tourStore.started) {
+    tourStore.continueTour([
+      {
+        element: 'main > .container',
+        popover: {
+          title: 'SoundInspector',
+          description: 'This is where you can drag and drop your audio files to analyze them.<br><b>Try dropping a file here!</b><br><br>Or click <b>Test File</b> to load a sample audio file.',
+          position: 'top',
+          onPopoverRender: (popover, { config, state }) => {
+            const testButton = document.createElement('button');
+            testButton.innerText = 'Test File';
+            popover.footerButtons.appendChild(testButton);
+
+            testButton.addEventListener('click', async () => {
+              const response = await fetch('/sample.wav');
+              const blob = await response.blob();
+              const file = new File([blob], "sample.wav", { type: "audio/wav" });
+              handleFile(file);
+              tourStore.pauseTour()
+            })
+          }
+        },
+      }
+    ])
   }
 })
 
