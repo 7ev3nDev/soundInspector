@@ -18,7 +18,3 @@ const mediaStore = useMediaStore();
   <MoreIcon/>
 </span>
 </template>
-
-<style scoped>
-
-</style>

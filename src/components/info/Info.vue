@@ -35,24 +35,6 @@ onUnmounted(() => {
       <b>All data is stored on your browser!</b>
     </div>
   </div>
-
-  <div class="container mini">
-    <a @click="tourStore.startTour([
-        {
-          popover: {
-            title: 'Welcome to soundInspector!',
-            description: 'This tour will guide you through the main features of the application.'
-          },
-        },
-        {
-          popover: {
-            onPopoverRender: () => {
-              $router.push('/');
-            }
-          }
-        }
-    ])" class="btn">Want a tour?</a>
-  </div>
 </template>
 
 <style scoped>
@@ -69,26 +51,8 @@ p {
 div.container {
   height: 260px;
 
-  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-
-  &.mini {
-    max-width: fit-content;
-    padding-inline: 16px;
-    border-radius: 24px;
-
-    height: unset;
-    margin-top: -82px;
-    position: relative;
-    top: 82px;
-
-    & > .btn {
-      background: var(--secondary);
-      color: var(--secondary-text);
-      font-weight: bold;
-    }
-  }
 }
 
 b {

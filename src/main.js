@@ -4,7 +4,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 
 import './style.css'
-import Home from "@/components/Home.vue";
+import Home from "@/components/home/Home.vue";
 import View from "@/components/view/View.vue";
 
 const pinia = createPinia();

@@ -13,9 +13,9 @@ export const useTourStore = defineStore('tour', () => {
         driverObj.setConfig({
             animate: true,
             showProgress: false,
-            onCloseClick: element => {
-                console.log('User clicked the close button', element);
-                // started.value = false;
+            onCloseClick: _ => {
+                started.value = false;
+                driverObj.destroy();
             }
         })
         driverObj.setSteps(steps);

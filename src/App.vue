@@ -1,5 +1,4 @@
 <script setup>
-import InfoIcon from "@/components/icons/InfoIcon.vue";
 import { useRoute } from 'vue-router'
 import { useHeaderStore } from "@/stores/headerStore.js";
 import { onMounted } from "vue";
@@ -24,10 +23,6 @@ onMounted(() => {
       <h2>soundInspector</h2>
       <div class="btns">
         <component :is="headerStore.buttonsContent.component" v-bind="headerStore.buttonsContent.props"/>
-
-        <RouterLink to="/info" class="btn" v-if="route.path === '/'">
-          <InfoIcon/>
-        </RouterLink>
       </div>
     </div>
     <div class="menu" :class="{ open: headerStore.isMenuOpen }" id="floating-menu">
@@ -119,7 +114,7 @@ header > div.menu {
 
 <style scoped>
 header {
-  width: 96%;
+  width: 98%;
   height: 100px;
   max-width: 800px;
   box-sizing: border-box;
@@ -178,6 +173,15 @@ main {
 }
 
 @media screen and (max-width: 600px) {
+  header {
+    padding: 11px 20px;
+
+    & > div.content {
+      padding-inline: 10px;
+      border-radius: 28px;
+    }
+  }
+
   div.content > h2 {
     font-size: 26px !important;
   }
