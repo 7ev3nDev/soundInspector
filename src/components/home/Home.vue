@@ -111,6 +111,7 @@ function startTour() {
           popover.footerButtons.appendChild(testButton);
 
           testButton.addEventListener('click', async () => {
+            loading.value = true;
             const response = await fetch('/sample.wav');
             const blob = await response.blob();
             const file = new File([ blob ], "sample.wav", { type: "audio/wav" });
